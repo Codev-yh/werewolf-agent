@@ -3,9 +3,9 @@
 from enum import Enum, auto
 from typing import List, Optional
 
-from game_logic.player import Player, Character
-from game_logic.result import GameResult
 from game_logic.game_config import GameConfig
+from game_logic.player import Character, Player
+from game_logic.result import GameResult
 
 
 class GameState(Enum):
