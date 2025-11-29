@@ -1,32 +1,79 @@
-from role import Role
+import requests
 from typing import Any
+from enum import Enum, unique
 
-# Player类表示游戏中的玩家，包含玩家的ID、角色和存活状态等属性。
+@unique
+# Defines roles used in the game; use like `Role.VILLAGER`.
+# Example: `player.role = Role.WOLF`.
+class Role(Enum):
+    VILLAGER = "Villager"
+    WOLF = "Werewolf"
+    PROPHET = "Prophet"
+    WITCH = "Witch"
+    HUNTER = "Hunter"
+
+    def __str__(self) -> str:
+        return self.value
+    
+    @property
+    # Converted to a property; use like `player.role.is_wolf`.
+    def is_wolf(self) -> bool:
+        return self == Role.WOLF
+    
+    @property
+    def is_cleric(self) -> bool:
+        return self in {Role.PROPHET, Role.WITCH, Role.HUNTER}
+    
+    @property
+    def is_hunter(self) -> bool:
+        return self == Role.HUNTER
+    
+    @property
+    def is_prophet(self) -> bool:
+        return self == Role.PROPHET
+    
+    @property
+    def is_witch(self) -> bool:
+        return self == Role.WITCH
+    
+    @property
+    def is_villager(self) -> bool:
+        return self == Role.VILLAGER
+    
+    @property
+    def is_good(self) -> bool:
+        return self in {Role.VILLAGER, Role.PROPHET, Role.WITCH, Role.HUNTER}
+
+# Represents a player in the game.
 class Player:
-    # 这样写之后，Game中传入的roles : list[Role] 中的元素需要是Role类型的对象，例如[Role.VILLAGER, Role.WOLF]
+    # With this typing, elements in Game's `roles: list[Role]` must be
+    # `Role` instances, e.g. `[Role.VILLAGER, Role.WOLF]`.
     def __init__(self, player_id:int, role : Role) :
         self.id : int = player_id
         self.role : Role = role
         self.is_alive : bool = True
 
-        self.witch_antidote : bool = True # 女巫解药，True表示可用
-        self.witch_poison : bool = True   # 女巫毒药，True表示可用
+        self.witch_antidote : bool = True  # Witch antidote; True means available
+        self.witch_poison : bool = True    # Witch poison; True means available
 
-        self.can_shoot : bool = True # 表示猎人是否能开枪，True表示可以开枪
+        self.can_shoot : bool = True  # Indicates whether the hunter can shoot; True means can shoot
 
-        self.prophet_check_history: list[dict[str, Any]] = [] # 预言家查看历史记录，包含查看的玩家ID和角色
+        # Prophet check history: contains checked player IDs and roles
+        self.prophet_check_history: list[dict[str, Any]] = []
 
-        self.survived_nights : int = 0 # 玩家存活的夜晚数
-        self.vote_correct_counts : int = 0 # 玩家投票正确的次数
-        self.mistake_counts : int = 0 # 玩家失误的次数，如毒杀好人等
+        self.survived_nights : int = 0  # Number of nights the player has survived
+        self.vote_correct_counts : int = 0  # Number of times the player voted correctly
+        self.mistake_counts : int = 0  # Number of mistakes made (e.g., poisoning a villager)
+
 
     def die(self, method: str) -> None :
-        # 将玩家的状态设置为死亡，同时标记死亡后果（如猎人不能开枪）
+        # Set the player's state to dead and mark consequences
+        # (for example, the hunter may not be able to shoot after death).
         self.is_alive = False
-        # 如果猎人被毒杀，设置为不能开枪
+        # If the hunter was poisoned, they cannot shoot.
         if self.role.is_hunter and method == "poison":    
             self.can_shoot = False
 
-    # 显示玩家信息
+    # Display player info
     def __repr__(self) -> str:
         return f"Player(id={self.id}, role={self.role.value}, Alive={self.is_alive})"
