@@ -3,9 +3,8 @@ from typing import Any
 from enum import Enum, unique
 
 @unique
-# Defines roles used in the game; use like `Role.VILLAGER`.
-# Example: `player.role = Role.WOLF`.
 class Role(Enum):
+    """Defines roles used in the game."""
     VILLAGER = "Villager"
     WOLF = "Werewolf"
     PROPHET = "Prophet"
@@ -16,7 +15,6 @@ class Role(Enum):
         return self.value
     
     @property
-    # Converted to a property; use like `player.role.is_wolf`.
     def is_wolf(self) -> bool:
         return self == Role.WOLF
     
@@ -44,11 +42,12 @@ class Role(Enum):
     def is_good(self) -> bool:
         return self in {Role.VILLAGER, Role.PROPHET, Role.WITCH, Role.HUNTER}
 
+
 # Represents a player in the game.
 class Player:
     # With this typing, elements in Game's `roles: list[Role]` must be
     # `Role` instances, e.g. `[Role.VILLAGER, Role.WOLF]`.
-    def __init__(self, player_id:int, role : Role) :
+    def __init__(self, player_id: int, role: Role):
         self.id : int = player_id
         self.role : Role = role
         self.is_alive : bool = True
@@ -77,3 +76,4 @@ class Player:
     # Display player info
     def __repr__(self) -> str:
         return f"Player(id={self.id}, role={self.role.value}, Alive={self.is_alive})"
+
