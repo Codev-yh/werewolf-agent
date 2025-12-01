@@ -40,7 +40,6 @@ class Game:
         # Track night actions
         self._night_killed_player: Optional[int] = None  # Player killed by werewolves
         self._witch_saved_player: Optional[int] = None  # Player saved by witch
-        self._guard_saved_player: Optional[int] = None  # Player saved by guard
         self._witch_killed_player: Optional[int] = None  # Player killed by witch
         self._hunter_killed_player: Optional[int] = None  # Player killed by hunter
         # Initialize players if roles provided
@@ -84,7 +83,6 @@ class Game:
         # Reset night action tracking
         self._night_killed_player = None
         self._witch_saved_player = None
-        self._guard_saved_player = None
         self._witch_killed_player = None
         self._hunter_killed_player = None
         
@@ -279,18 +277,6 @@ class Game:
         witch.witch_antidote = False
         return True
 
-    def process_guard_saving(self, saved_player: int) -> bool:
-        """
-        Process the guard saving player.
-        Args:
-            saved_player(int): the saved player's ID
-        Returns:
-            bool: True if saving was successful, False otherwise
-        """
-        # Note: Guard role is not in the Role enum, but we'll implement it for future use
-        # For now, just track the saved player
-        self._guard_saved_player = saved_player
-        return True
 
     def process_witch_killing(self, killed_player: int) -> bool:
         """
@@ -365,15 +351,14 @@ class Game:
     
     def _process_night_actions(self) -> None:
         """Process all night actions in the correct order."""
-        # Order: Werewolf kill -> Witch save -> Guard save -> Witch kill -> Hunter kill
+        # Order: Werewolf kill -> Witch save -> Witch kill -> Hunter kill
         
         # 1. Werewolf kill (if not saved)
         if self._night_killed_player is not None:
             killed_player = self._get_player_by_id(self._night_killed_player)
-            # Check if saved by witch or guard
+            # Check if saved by witch
             if (killed_player and 
-                killed_player.id != self._witch_saved_player and 
-                killed_player.id != self._guard_saved_player):
+                killed_player.id != self._witch_saved_player):
                 killed_player.die("werewolf")
         
         # 2. Witch kill
