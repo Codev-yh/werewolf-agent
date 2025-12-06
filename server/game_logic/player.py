@@ -1,4 +1,3 @@
-import requests
 from typing import Any
 from enum import Enum, unique
 
@@ -43,37 +42,40 @@ class Role(Enum):
         return self in {Role.VILLAGER, Role.PROPHET, Role.WITCH, Role.HUNTER}
 
 
-# Represents a player in the game.
 class Player:
-    # With this typing, elements in Game's `roles: list[Role]` must be
-    # `Role` instances, e.g. `[Role.VILLAGER, Role.WOLF]`.
+    """Represents a player in the game with their role and state."""
     def __init__(self, player_id: int, role: Role):
         self.id : int = player_id
         self.role : Role = role
         self.is_alive : bool = True
 
-        self.witch_antidote : bool = True  # Witch antidote; True means available
-        self.witch_poison : bool = True    # Witch poison; True means available
+        # Witch antidote; True means available
+        self.witch_antidote : bool = True  
+        # Witch poison; True means available
+        self.witch_poison : bool = True    
 
-        self.can_shoot : bool = True  # Indicates whether the hunter can shoot; True means can shoot
+        # Hunter can shoot; True means can shoot
+        self.can_shoot : bool = True  
 
         # Prophet check history: contains checked player IDs and roles
         self.prophet_check_history: list[dict[str, Any]] = []
 
-        self.survived_nights : int = 0  # Number of nights the player has survived
-        self.vote_correct_counts : int = 0  # Number of times the player voted correctly
-        self.mistake_counts : int = 0  # Number of mistakes made (e.g., poisoning a villager)
+        # Number of nights the player has survived
+        self.survived_nights : int = 0  
+        # Number of times the player voted correctly
+        self.vote_correct_counts : int = 0 
+        # Number of mistakes made (e.g., poisoning a villager)
+        self.mistake_counts : int = 0 
 
 
     def die(self, method: str) -> None :
-        # Set the player's state to dead and mark consequences
-        # (for example, the hunter may not be able to shoot after death).
+        """Set the player's state to dead and mark consequences"""
         self.is_alive = False
         # If the hunter was poisoned, they cannot shoot.
         if self.role.is_hunter and method == "poison":    
             self.can_shoot = False
 
-    # Display player info
     def __repr__(self) -> str:
+        """Return a string representation of the player."""
         return f"Player(id={self.id}, role={self.role.value}, Alive={self.is_alive})"
 
