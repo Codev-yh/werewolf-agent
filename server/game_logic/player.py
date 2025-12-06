@@ -1,6 +1,7 @@
 from typing import Any
 from enum import Enum, unique
 
+
 @unique
 class Role(Enum):
     """Defines roles used in the game."""
