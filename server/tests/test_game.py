@@ -1,6 +1,5 @@
 """Tests for the main Game class."""
 
-import pytest
 from game_logic.game import Game, GameState
 from game_logic.game_config import NORMAL_CONFIG_6_PLAYER
 from game_logic.player import Character, Player
