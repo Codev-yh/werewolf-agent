@@ -18,7 +18,6 @@ class TestGame:
         assert game._config == NORMAL_CONFIG_6_PLAYER
         assert not game._players
 
-    @pytest.mark.xfail(strict=True, reason="Game logic not implemented yet")
     def test_game_start(self):
         """Test that start method initializes players and sets state."""
         game = Game(NORMAL_CONFIG_6_PLAYER)
@@ -33,7 +32,6 @@ class TestGame:
         assert characters.count(Character.SEER) == 1
         assert characters.count(Character.WITCH) == 1
 
-    @pytest.mark.xfail(strict=True, reason="Game logic not implemented yet")
     def test_sun_rise(self):
         """Test that _sun_rise method changes state to MORNING."""
         game = Game(NORMAL_CONFIG_6_PLAYER)
@@ -41,7 +39,6 @@ class TestGame:
         game._sun_rise()
         assert game._state == GameState.MORNING
 
-    @pytest.mark.xfail(strict=True, reason="Game logic not implemented yet")
     def test_sun_set(self):
         """Test that _sun_set method changes state to EVENING."""
         game = Game(NORMAL_CONFIG_6_PLAYER)
@@ -49,7 +46,6 @@ class TestGame:
         game._sun_set()
         assert game._state == GameState.EVENING
 
-    @pytest.mark.xfail(strict=True, reason="Game logic not implemented yet")
     def test_is_end(self):
         """Test is_end method."""
         game = Game(NORMAL_CONFIG_6_PLAYER)
@@ -73,7 +69,6 @@ class TestGame:
         game._players[1].alive = False
         assert game.is_end()
 
-    @pytest.mark.xfail(strict=True, reason="Game logic not implemented yet")
     def test_is_character_alive(self):
         """Test is_character_alive method."""
         game = Game(NORMAL_CONFIG_6_PLAYER)
@@ -92,7 +87,6 @@ class TestGame:
         assert game.is_character_alive(Character.WEREWOLF)
         assert not game.is_character_alive(Character.VILLAGER)
 
-    @pytest.mark.xfail(strict=True, reason="Game logic not implemented yet")
     def test_get_result(self):
         """Test get_result method."""
         game = Game(NORMAL_CONFIG_6_PLAYER)
@@ -115,7 +109,6 @@ class TestGame:
         result = game.get_result()
         assert result == GameResult.WEREWOLF_WIN
 
-    @pytest.mark.xfail(strict=True, reason="Game logic not implemented yet")
     def test_state_switch(self):
         """Test state_switch method."""
         game = Game(NORMAL_CONFIG_6_PLAYER)
