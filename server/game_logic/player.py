@@ -1,8 +1,5 @@
-"""Contains the definition of players and related classes"""
-
 from enum import Enum
 from typing import Any
-
 
 class Role(Enum):
     """The character enum"""
@@ -15,12 +12,9 @@ class Role(Enum):
     GUARD = "guard"
 
 
-
-# pylint: disable=too-few-public-methods
-# ^ TODO: remove it after the class finished
 class Player:
-    """The player class."""
-    def __init__(self, player_id:int, role : Role) :
+    """Represents a player in the game with their role and state."""
+    def __init__(self, player_id: int, role: Role):
         self.id : int = player_id
         self.role : Role = role
         self.is_alive : bool = True
