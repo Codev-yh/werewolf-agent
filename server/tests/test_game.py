@@ -13,7 +13,7 @@ class TestGame:
         """Test that the game initializes with the correct state and config."""
         game = Game(NORMAL_CONFIG_6_PLAYER)
         # pylint: disable=protected-access
-        assert game._state == GameState.NOT_STARTED
+        assert game.state == GameState.NOT_STARTED
         assert game._config == NORMAL_CONFIG_6_PLAYER
         assert not game._players
 
@@ -21,7 +21,7 @@ class TestGame:
         """Test that start method initializes players and sets state."""
         game = Game(NORMAL_CONFIG_6_PLAYER)
         game.start()
-        assert game._state == GameState.EVENING
+        assert game.state == GameState.EVENING
         assert len(game._players) == 6
 
         # Verify character distribution
@@ -34,16 +34,16 @@ class TestGame:
     def test_sun_rise(self):
         """Test that _sun_rise method changes state to MORNING."""
         game = Game(NORMAL_CONFIG_6_PLAYER)
-        game._state = GameState.EVENING
+        game.state = GameState.EVENING
         game._sun_rise()
-        assert game._state == GameState.MORNING
+        assert game.state == GameState.MORNING
 
     def test_sun_set(self):
         """Test that _sun_set method changes state to EVENING."""
         game = Game(NORMAL_CONFIG_6_PLAYER)
-        game._state = GameState.MORNING
+        game.state = GameState.MORNING
         game._sun_set()
-        assert game._state == GameState.EVENING
+        assert game.state == GameState.EVENING
 
     def test_is_end(self):
         """Test is_end method."""
@@ -114,4 +114,4 @@ class TestGame:
 
         # Not Started -> Start (Evening)
         game.state_switch()
-        assert game._state == GameState.EVENING
+        assert game.state == GameState.EVENING
