@@ -40,10 +40,13 @@ class Game:
         self._day: int = 0
         self._running: bool = True
         # Track night actions
-        self._night_killed_player: Optional[int] = None  # Player killed by werewolves
+        # Player killed by werewolves
+        self._night_killed_player: Optional[int] = None
         self._witch_saved_player: Optional[int] = None  # Player saved by witch
-        self._witch_killed_player: Optional[int] = None  # Player killed by witch
-        self._hunter_killed_player: Optional[int] = None  # Player killed by hunter
+        # Player killed by witch
+        self._witch_killed_player: Optional[int] = None
+        # Player killed by hunter
+        self._hunter_killed_player: Optional[int] = None
 
         # Initialize players if roles provided
         # TODO: wtf is this??????
@@ -71,7 +74,8 @@ class Game:
         # Assign the character, shuffle the id of the players
         # If the player needs any initialization operations, do it.
         if self.state != GameState.NOT_STARTED:
-            raise ValueError("Game can only be started when state is NOT_STARTED")
+            raise ValueError(
+                "Game can only be started when state is NOT_STARTED")
 
         # Shuffle player IDs if not already done
         if self._players:
@@ -133,8 +137,8 @@ class Game:
         alive_gods = sum(
             1
             for p in self._players
-            if p.is_alive and (p.role != Role.WEREWOLF and p.role != Role.VILLAGER)
-        )  # TODO: try using the recommendation
+            if p.is_alive and p.role not in (Role.WEREWOLF, Role.VILLAGER)
+        )
 
         # Game ends if all werewolves are dead (villagers win)
         # or if werewolves equal or outnumber villagers (werewolves win)
@@ -188,7 +192,8 @@ class Game:
                 self._running = False
         elif self.state == GameState.MORNING:
             # Morning --> Evening or End
-            # Check if game ends after voting (should be checked before calling state_switch)
+            # Check if game ends after voting
+            # (should be checked before calling state_switch)
             if self.is_end():
                 self.state = GameState.FINISHED
                 self._running = False
@@ -202,7 +207,8 @@ class Game:
         Args:
             voting_result (List[int]): the list of voted players' ID
         Returns:
-            bool: True if a player was successfully voted out, False if there's a tie
+            bool: True if a player was successfully voted out,
+                  False if there's a tie
         """
         if not voting_result:
             return False
@@ -245,7 +251,8 @@ class Game:
         Args:
             voting_result (List[int]): the list of voted players' ID
         Returns:
-            bool: True if a player was successfully voted to be killed, False if there's a tie
+            bool: True if a player was successfully voted to be killed,
+                  False if there's a tie
         """
         if not voting_result:
             return False
