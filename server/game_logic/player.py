@@ -1,8 +1,5 @@
-"""Contains the definition of players and related classes"""
-
 from enum import Enum
 from typing import Any
-
 
 class Role(Enum):
     """The character enum"""
