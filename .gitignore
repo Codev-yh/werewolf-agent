@@ -208,3 +208,5 @@ __marimo__/
 
 # VSCode Cache
 .vscode/
+
+.DS_Store
