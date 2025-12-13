@@ -74,10 +74,7 @@ class GameRunner:
     @property
     def is_running(self) -> bool:
         """If the game is running"""
-        return (
-            self._game is not None
-            and self._game.state is not GameState.NOT_STARTED
-        )
+        return self._game is not None and self._game.state is not GameState.NOT_STARTED
 
     @property
     def is_bound_with_server(self) -> bool:

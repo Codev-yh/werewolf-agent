@@ -74,8 +74,7 @@ class Game:
         # Assign the character, shuffle the id of the players
         # If the player needs any initialization operations, do it.
         if self.state != GameState.NOT_STARTED:
-            raise ValueError(
-                "Game can only be started when state is NOT_STARTED")
+            raise ValueError("Game can only be started when state is NOT_STARTED")
 
         # Shuffle player IDs if not already done
         if self._players:
@@ -170,8 +169,7 @@ class Game:
 
         if alive_werewolves == 0:
             return GameResult.VILLAGERS_WIN
-        else:  # TODO: fix warning
-            return GameResult.WEREWOLF_WIN
+        return GameResult.WEREWOLF_WIN
 
     def state_switch(self) -> None:
         """
