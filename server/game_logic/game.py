@@ -1,12 +1,13 @@
 """Contains Game Class"""
 
+import random
 from enum import Enum, auto
 from typing import List, Optional
-import random
 
 from game_logic.player import Player, Role
 from game_logic.result import GameResult
-#from game_logic.game_config import GameConfig
+
+# from game_logic.game_config import GameConfig
 
 
 class GameState(Enum):
@@ -20,18 +21,19 @@ class GameState(Enum):
     FINISHED = auto()
 
 
-# pylint: disable=too-few-public-methods
-# ^ TODO: remove it when code is finished
+# pylint: disable=too-many-instance-attributes
 class Game:
     """The game state class"""
 
+    # TODO: change role type to GameConfig
     def __init__(self, roles: Optional[List[Role]] = None) -> None:
         """
         Initialize the game.
         Args:
-            roles: Optional list of roles to assign to players. If None, players should be set separately.
+            roles: Optional list of roles to assign to players.
+            If None, players should be set separately.
         """
-        self._state = GameState.NOT_STARTED
+        self.state = GameState.NOT_STARTED
         # the player list. the player with ID `i` is _player[i - 1] since in
         # werewolf game, the index begin at 1.
         self._players: List[Player] = []
@@ -42,13 +44,24 @@ class Game:
         self._witch_saved_player: Optional[int] = None  # Player saved by witch
         self._witch_killed_player: Optional[int] = None  # Player killed by witch
         self._hunter_killed_player: Optional[int] = None  # Player killed by hunter
-        # Initialize players if roles provided
-        if roles is not None:
-            roles = ["villager", "villager", "villager", "werewolf", "werewolf", "werewolf", "witch", "prophet", "hunter"]  # 用列表存储角色
-            player_ids = list(range(1, 10))
-            for i, role in enumerate(roles):
-                self._players.append(Player(player_ids[i], Role(role)))
 
+        # Initialize players if roles provided
+        # TODO: wtf is this??????
+        if roles is None:
+            roles = [
+                "villager",
+                "villager",
+                "villager",
+                "werewolf",
+                "werewolf",
+                "werewolf",
+                "witch",
+                "prophet",
+                "hunter",
+            ]
+        player_ids = list(range(1, 10))
+        for i, role in enumerate(roles):
+            self._players.append(Player(player_ids[i], Role(role)))
 
     def start(self) -> None:
         """
@@ -57,50 +70,50 @@ class Game:
         """
         # Assign the character, shuffle the id of the players
         # If the player needs any initialization operations, do it.
-        if self._state != GameState.NOT_STARTED:
+        if self.state != GameState.NOT_STARTED:
             raise ValueError("Game can only be started when state is NOT_STARTED")
-        
+
         # Shuffle player IDs if not already done
         if self._players:
             player_ids = [p.id for p in self._players]
             random.shuffle(player_ids)
             for i, player in enumerate(self._players):
                 player.id = player_ids[i]
-        
+
         # Initialize game state
-        self._state = GameState.EVENING
+        self.state = GameState.EVENING
         self._day = 0
         self._running = True
 
     def _sun_rise(self) -> None:
         """Going from night to morning."""
-        if self._state != GameState.EVENING:
+        if self.state != GameState.EVENING:
             raise ValueError("Can only call _sun_rise when state is EVENING")
-        
+
         # Process night actions
         self._process_night_actions()
-        
+
         # Reset night action tracking
         self._night_killed_player = None
         self._witch_saved_player = None
         self._witch_killed_player = None
         self._hunter_killed_player = None
-        
+
         # Increment day and change state
         self._day += 1
-        self._state = GameState.MORNING
+        self.state = GameState.MORNING
 
     def _sun_set(self) -> None:
         """Going from morning to evening."""
-        if self._state != GameState.MORNING:
+        if self.state != GameState.MORNING:
             raise ValueError("Can only call _sun_set when state is MORNING")
-        
+
         # Update survived nights for alive players
         for player in self._players:
             if player.is_alive:
                 player.survived_nights += 1
-        
-        self._state = GameState.EVENING
+
+        self.state = GameState.EVENING
 
     def is_end(self) -> bool:
         """
@@ -108,16 +121,21 @@ class Game:
         Returns:
         bool: if the game is end.
         """
-        if self._state == GameState.FINISHED:
+        if self.state == GameState.FINISHED:
             return True
-        
-        alive_werewolves = sum(1 for p in self._players 
-                              if p.is_alive and p.role == Role.WEREWOLF)
-        alive_villagers = sum(1 for p in self._players 
-                             if p.is_alive and p.role == Role.VILLAGER)
-        alive_gods = sum(1 for p in self._players 
-                             if p.is_alive and(p.role != Role.WEREWOLF and p.role != Role.VILLAGER))
-        
+
+        alive_werewolves = sum(
+            1 for p in self._players if p.is_alive and p.role == Role.WEREWOLF
+        )
+        alive_villagers = sum(
+            1 for p in self._players if p.is_alive and p.role == Role.VILLAGER
+        )
+        alive_gods = sum(
+            1
+            for p in self._players
+            if p.is_alive and (p.role != Role.WEREWOLF and p.role != Role.VILLAGER)
+        )  # TODO: try using the recommendation
+
         # Game ends if all werewolves are dead (villagers win)
         # or if werewolves equal or outnumber villagers (werewolves win)
         return alive_werewolves == 0 or alive_villagers == 0 or alive_gods == 0
@@ -140,14 +158,15 @@ class Game:
         """
         if not self.is_end():
             return None
-        
+
         # Count alive werewolves
-        alive_werewolves = sum(1 for p in self._players 
-                              if p.is_alive and p.role == Role.WEREWOLF)
-        
+        alive_werewolves = sum(
+            1 for p in self._players if p.is_alive and p.role == Role.WEREWOLF
+        )
+
         if alive_werewolves == 0:
             return GameResult.VILLAGERS_WIN
-        else:
+        else:  # TODO: fix warning
             return GameResult.WEREWOLF_WIN
 
     def state_switch(self) -> None:
@@ -157,21 +176,21 @@ class Game:
         - Switching from night to day
         Only this method can change the state into `end`.
         """
-        if self._state == GameState.NOT_STARTED:
+        if self.state == GameState.NOT_STARTED:
             # Not Started --> Evening: do exactly the same thing as Start()
             self.start()
-        elif self._state == GameState.EVENING:
+        elif self.state == GameState.EVENING:
             # Evening --> Morning or End
             self._sun_rise()
             # Check if game ends after night actions
             if self.is_end():
-                self._state = GameState.FINISHED
+                self.state = GameState.FINISHED
                 self._running = False
-        elif self._state == GameState.MORNING:
+        elif self.state == GameState.MORNING:
             # Morning --> Evening or End
             # Check if game ends after voting (should be checked before calling state_switch)
             if self.is_end():
-                self._state = GameState.FINISHED
+                self.state = GameState.FINISHED
                 self._running = False
             else:
                 self._sun_set()
@@ -187,7 +206,7 @@ class Game:
         """
         if not voting_result:
             return False
-        
+
         # Count votes for each player
         vote_count: dict[int, int] = {}
         for player_id in voting_result:
@@ -195,27 +214,29 @@ class Game:
                 vote_count[player_id] += 1
             else:
                 vote_count[player_id] = 1
-        
+
         # Find the maximum vote count
         if not vote_count:
             return False
-        
+
         max_votes = max(vote_count.values())
-        
+
         # Find all players with max votes
-        max_voted_players = [pid for pid, votes in vote_count.items() if votes == max_votes]
-        
+        max_voted_players = [
+            pid for pid, votes in vote_count.items() if votes == max_votes
+        ]
+
         # If there's a tie (multiple players with max votes), return False
         if len(max_voted_players) > 1:
             return False
-        
+
         # Execute the vote - kill the player with most votes
         voted_player_id = max_voted_players[0]
         player = self._get_player_by_id(voted_player_id)
         if player and player.is_alive:
             player.die("voting")
             return True
-        
+
         return False
 
     def process_werewolf_voting_result(self, voting_result: List[int]) -> bool:
@@ -228,7 +249,7 @@ class Game:
         """
         if not voting_result:
             return False
-        
+
         # Count votes for each player
         vote_count: dict[int, int] = {}
         for player_id in voting_result:
@@ -236,20 +257,22 @@ class Game:
                 vote_count[player_id] += 1
             else:
                 vote_count[player_id] = 1
-        
+
         # Find the maximum vote count
         if not vote_count:
             return False
-        
+
         max_votes = max(vote_count.values())
-        
+
         # Find all players with max votes
-        max_voted_players = [pid for pid, votes in vote_count.items() if votes == max_votes]
-        
+        max_voted_players = [
+            pid for pid, votes in vote_count.items() if votes == max_votes
+        ]
+
         # If there's a tie (multiple players with max votes), return False
         if len(max_voted_players) > 1:
             return False
-        
+
         # Set the night killed player (will be processed in _process_night_actions)
         voted_player_id = max_voted_players[0]
         self._night_killed_player = voted_player_id
@@ -267,16 +290,15 @@ class Game:
         witch = self._get_player_by_role(Role.WITCH)
         if not witch or not witch.is_alive:
             return False
-        
+
         # Check if witch still has antidote
         if not witch.witch_antidote:
             return False
-        
+
         # Save the player and consume antidote
         self._witch_saved_player = saved_player
         witch.witch_antidote = False
         return True
-
 
     def process_witch_killing(self, killed_player: int) -> bool:
         """
@@ -290,11 +312,11 @@ class Game:
         witch = self._get_player_by_role(Role.WITCH)
         if not witch or not witch.is_alive:
             return False
-        
+
         # Check if witch still has poison
         if not witch.witch_poison:
             return False
-        
+
         # Set the player to be killed and consume poison
         self._witch_killed_player = killed_player
         witch.witch_poison = False
@@ -312,11 +334,11 @@ class Game:
         hunter = self._get_player_by_role(Role.HUNTER)
         if not hunter or not hunter.is_alive:
             return False
-        
+
         # Check if hunter can shoot
         if not hunter.can_shoot:
             return False
-        
+
         # Set the player to be killed
         self._hunter_killed_player = killed_player
         hunter.can_shoot = False  # Hunter can only shoot once
@@ -334,39 +356,38 @@ class Game:
         if player:
             return player.role
         raise ValueError(f"Player with ID {player_id} not found")
-    
+
     def _get_player_by_id(self, player_id: int) -> Optional[Player]:
         """Helper method to get player by ID."""
         for player in self._players:
             if player.id == player_id:
                 return player
         return None
-    
+
     def _get_player_by_role(self, role: Role) -> Optional[Player]:
         """Helper method to get the first alive player with the given role."""
         for player in self._players:
             if player.is_alive and player.role == role:
                 return player
         return None
-    
+
     def _process_night_actions(self) -> None:
         """Process all night actions in the correct order."""
         # Order: Werewolf kill -> Witch save -> Witch kill -> Hunter kill
-        
+
         # 1. Werewolf kill (if not saved)
         if self._night_killed_player is not None:
             killed_player = self._get_player_by_id(self._night_killed_player)
             # Check if saved by witch
-            if (killed_player and 
-                killed_player.id != self._witch_saved_player):
+            if killed_player and killed_player.id != self._witch_saved_player:
                 killed_player.die("werewolf")
-        
+
         # 2. Witch kill
         if self._witch_killed_player is not None:
             killed_player = self._get_player_by_id(self._witch_killed_player)
             if killed_player and killed_player.is_alive:
                 killed_player.die("poison")
-        
+
         # 3. Hunter kill (if hunter died and can shoot)
         if self._hunter_killed_player is not None:
             killed_player = self._get_player_by_id(self._hunter_killed_player)
