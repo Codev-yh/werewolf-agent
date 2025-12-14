@@ -4,10 +4,9 @@ import random
 from enum import Enum, auto
 from typing import List, Optional
 
-from game_logic.player import Player, Role, DeathReason
+from game_logic.game_config import NORMAL_CONFIG_9_PLAYER, GameConfig
+from game_logic.player import DeathReason, Player, Role
 from game_logic.result import GameResult
-
-from game_logic.game_config import GameConfig, NORMAL_CONFIG_9_PLAYER
 
 
 class GameState(Enum):
