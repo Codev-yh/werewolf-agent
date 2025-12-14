@@ -1,6 +1,6 @@
 """Tests for Player class and Role enum."""
 
-from game_logic.player import Player, Role
+from game_logic.player import Player, Role, DeathReason
 
 
 class TestRole:
@@ -41,21 +41,21 @@ class TestPlayer:
     def test_player_die(self):
         """Test Player.die() method sets is_alive to False."""
         player = Player(1, Role.VILLAGER)
-        player.die("vote")
+        player.die(DeathReason.VOTED)
         assert player.is_alive is False
 
     def test_hunter_poison_disables_shot(self):
         """Test that hunter poisoned by witch cannot shoot."""
         hunter = Player(1, Role.HUNTER)
         assert hunter.can_shoot is True
-        hunter.die("poison")
+        hunter.die(DeathReason.WITCH_POISON)
         assert hunter.is_alive is False
         assert hunter.can_shoot is False
 
     def test_hunter_other_death_keeps_shot(self):
         """Test that hunter killed by other means can still shoot."""
         hunter = Player(1, Role.HUNTER)
-        hunter.die("werewolf")
+        hunter.die(DeathReason.WEREWOLF_KILLED)
         assert hunter.is_alive is False
         assert hunter.can_shoot is True
 
@@ -63,5 +63,5 @@ class TestPlayer:
         """Test Player.__repr__() method."""
         player = Player(1, Role.VILLAGER)
         assert repr(player) == "Player(id=1, role=villager, Alive=True)"
-        player.die("vote")
+        player.die(DeathReason.VOTED)
         assert repr(player) == "Player(id=1, role=villager, Alive=False)"
