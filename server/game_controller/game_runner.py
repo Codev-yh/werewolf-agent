@@ -33,7 +33,8 @@ class GameRunner:
 
         self._task: Optional[asyncio.Task[None]] = None
 
-        # players that are already connected, different from config.player_number
+        # players that are already connected,
+        # different from config.player_number
         self.player_count = 0
 
     async def start(self) -> None:
@@ -74,7 +75,10 @@ class GameRunner:
     @property
     def is_running(self) -> bool:
         """If the game is running"""
-        return self._game is not None and self._game.state is not GameState.NOT_STARTED
+        return (
+            self._game is not None
+            and self._game.state is not GameState.NOT_STARTED
+        )
 
     @property
     def is_bound_with_server(self) -> bool:
@@ -89,9 +93,18 @@ class GameRunner:
     @property
     def is_end(self) -> bool:
         """If the game is already ended."""
-        return self._game is not None and self._game.state is GameState.FINISHED
+        return (
+            self._game is not None and self._game.state is GameState.FINISHED
+        )
 
     @property
     def player_ready(self) -> bool:
         """If number of connected players is enough"""
         return self.player_count == self.config.player_number
+
+    @property
+    def day(self) -> int:
+        """The current day if game is running"""
+        if self._game is None:
+            raise RuntimeError("Game hasn't started yet!")
+        return self._game.day

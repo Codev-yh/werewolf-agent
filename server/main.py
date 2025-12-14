@@ -1,4 +1,5 @@
 """Entry Point for Server"""
+
 import argparse
 import asyncio
 import logging
@@ -8,16 +9,20 @@ from game_controller.game_runner import GameRunner
 from game_logic.game_config import (
     NORMAL_CONFIG_6_PLAYER,
     NORMAL_CONFIG_9_PLAYER,
-    GameConfig
+    GameConfig,
 )
 from recorder.recorder import Recorder
 
+
 class Options:
-    def __init__(self, logging_level: int, host: str, port: int, config_id: str):
+    def __init__(
+        self, logging_level: int, host: str, port: int, config_id: str
+    ):
         self.logging_level = logging_level
         self.host = host
         self.port = port
         self.config_id = config_id
+
 
 DEFAULT_LOGGING_LEVEL = logging.INFO
 DEFAULT_HOST = "0.0.0.0"
@@ -26,10 +31,11 @@ DEFAULT_CONFIG_ID = "6"
 DEFAULT_LOOP_INTERVAL = 0.5
 LOGGING_FORMAT = "[%(asctime)s] [%(levelname)s] %(message)s"
 
+
 def parse_options() -> Options:
     host_env = os.getenv("WEREWOLF_HOST", default=DEFAULT_HOST)
     port_env = os.getenv("WEREWOLF_PORT", default=str(DEFAULT_PORT))
-    
+
     parser = argparse.ArgumentParser("werewolf_server")
     parser.add_argument(
         "--logging-level",
@@ -44,27 +50,33 @@ def parse_options() -> Options:
             logging.DEBUG,
         ],
     )
-    parser.add_argument("--host", type=str, help="Server host", default=host_env)
-    parser.add_argument("--port", type=int, help="Server port", default=int(port_env))
     parser.add_argument(
-        "--config", 
-        type=str, 
-        help="Game config (6 or 9)", 
-        default=DEFAULT_CONFIG_ID,
-        choices=["6", "9"]
+        "--host", type=str, help="Server host", default=host_env
     )
-    
+    parser.add_argument(
+        "--port", type=int, help="Server port", default=int(port_env)
+    )
+    parser.add_argument(
+        "--config",
+        type=str,
+        help="Game config (6 or 9)",
+        default=DEFAULT_CONFIG_ID,
+        choices=["6", "9"],
+    )
+
     args = parser.parse_args()
     return Options(
         logging_level=args.logging_level,
         host=args.host,
         port=args.port,
-        config_id=args.config
+        config_id=args.config,
     )
 
+
 async def main():
-    # Configuration is read from command line arguments and environment variables
-    # This includes host, port, game rules, number of players, and trusted tokens
+    # Configuration is read from command line arguments and environment
+    # variables, which includes host, port, game rules, number of players,
+    # and trusted tokens
 
     options = parse_options()
 
@@ -83,7 +95,12 @@ async def main():
     game_runner.bind_recorder(recorder)
     agent_server.bind_runner(game_runner)
 
-    logging.info(f"Werewolf Server is starting on {options.host}:{options.port} with {options.config_id} players config")
+    logging.info(
+        "Werewolf Server is starting on %s:%d with %d players expected",
+        options.host,
+        options.port,
+        game_config.player_number,
+    )
     # recorder.bind_runner(game_runner)
     # ^ TODO: finish the method definition
 
@@ -95,22 +112,34 @@ async def main():
         await asyncio.sleep(DEFAULT_LOOP_INTERVAL)
         if not game_runner.player_ready:
             if not is_previous_waiting:
-                logging.info(f"Server is waiting for players ({game_runner.player_count}/{game_config.player_number})")
+                logging.info(
+                    "Server is waiting for players (%d/%d)",
+                    game_runner.player_count,
+                    game_config.player_number,
+                )
                 is_previous_waiting = True
             else:
                 # Optional: debug log for heartbeat
-                logging.debug(f"Still waiting... ({game_runner.player_count}/{game_config.player_number})")
+                logging.debug(
+                    "Still waiting... (%d/%d)",
+                    game_runner.player_count,
+                    game_config.player_number,
+                )
             continue
         # Stage II: run the game
         if not is_game_running:
             if is_previous_waiting:
                 logging.info("All players connected. Initializing game...")
                 is_previous_waiting = False
-            
-            # This triggers the role assignment and sends the initial message to agents
-            await game_runner.start() 
-            
-            logging.info(f"Game started! Roles assigned and broadcast sent. Day {game_runner._game._day}")
+
+            # This triggers the role assignment and sends the
+            # initializing message to agents
+            await game_runner.start()
+
+            logging.info(
+                "Game started! Roles assigned and broadcast sent. Day %d.",
+                game_runner.day,
+            )
             is_game_running = True
             continue
         if game_runner.is_end:
