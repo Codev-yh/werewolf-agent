@@ -39,3 +39,4 @@ class AgentServer:
         If the bound already exists, then pass. If already bound with
         different runner, then raise.
         """
+        raise NotImplementedError
