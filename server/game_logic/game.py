@@ -7,7 +7,7 @@ from typing import List, Optional
 from game_logic.player import Player, Role
 from game_logic.result import GameResult
 
-# from game_logic.game_config import GameConfig
+from game_logic.game_config import GameConfig, NORMAL_CONFIG_9_PLAYER
 
 
 class GameState(Enum):
@@ -25,14 +25,17 @@ class GameState(Enum):
 class Game:
     """The game state class"""
 
-    # TODO: change role type to GameConfig
-    def __init__(self, roles: Optional[List[Role]] = None) -> None:
+    def __init__(self, config: Optional[GameConfig] = None) -> None:
         """
         Initialize the game.
         Args:
             roles: Optional list of roles to assign to players.
             If None, players should be set separately.
         """
+        if config is None:
+            self.config = NORMAL_CONFIG_9_PLAYER
+        else:
+            self.config = config
         self.state = GameState.NOT_STARTED
         # the player list. the player with ID `i` is _player[i - 1] since in
         # werewolf game, the index begin at 1.
@@ -49,19 +52,14 @@ class Game:
         self._hunter_killed_player: Optional[int] = None
 
         # Initialize players if roles provided
-        # TODO: wtf is this??????
-        if roles is None:
-            roles = [
-                "villager",
-                "villager",
-                "villager",
-                "werewolf",
-                "werewolf",
-                "werewolf",
-                "witch",
-                "prophet",
-                "hunter",
-            ]
+        roles: List[Role] = []
+        for role, count in config.character_count.items():
+            roles.extend([role] * count)
+        if len(roles) != config.player_number:
+            raise ValueError(
+                f"Config Error: Sum of roles ({len(roles)}) does not match "
+                f"player_number ({config.player_number})"
+            )
         player_ids = list(range(1, 10))
         for i, role in enumerate(roles):
             self._players.append(Player(player_ids[i], Role(role)))
@@ -141,7 +139,7 @@ class Game:
 
         # Game ends if all werewolves are dead (villagers win)
         # or if werewolves equal or outnumber villagers (werewolves win)
-        return alive_werewolves == 0 or alive_villagers == 0 or alive_gods == 0
+        return alive_werewolves == 0 or alive_werewolves >= (alive_villagers + alive_gods)
 
     def is_character_alive(self, character: Role) -> bool:
         """
@@ -163,13 +161,27 @@ class Game:
             return None
 
         # Count alive werewolves
-        alive_werewolves = sum(
-            1 for p in self._players if p.is_alive and p.role == Role.WEREWOLF
-        )
+        alive_werewolves = 0
+        alive_villagers = 0
+        alive_gods = 0
+
+        for p in self._players:
+            if not p.is_alive:
+                continue
+            
+            if p.role == Role.WEREWOLF:
+                alive_werewolves += 1
+            elif p.role == Role.VILLAGER:
+                alive_villagers += 1
+            else:
+                # Any role that is not Werewolf or Villager is considered a God
+                alive_gods += 1
 
         if alive_werewolves == 0:
             return GameResult.VILLAGERS_WIN
-        return GameResult.WEREWOLF_WIN
+        if alive_werewolves >= (alive_villagers + alive_gods):
+            return GameResult.WEREWOLF_WIN
+        return None
 
     def state_switch(self) -> None:
         """
