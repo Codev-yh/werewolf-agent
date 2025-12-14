@@ -43,10 +43,13 @@ class Game:
         self._day: int = 0
         self._running: bool = True
         # Track night actions
-        self._night_killed_player: Optional[int] = None  # Player killed by werewolves
+        # Player killed by werewolves
+        self._night_killed_player: Optional[int] = None
         self._witch_saved_player: Optional[int] = None  # Player saved by witch
-        self._witch_killed_player: Optional[int] = None  # Player killed by witch
-        self._hunter_killed_player: Optional[int] = None  # Player killed by hunter
+        # Player killed by witch
+        self._witch_killed_player: Optional[int] = None
+        # Player killed by hunter
+        self._hunter_killed_player: Optional[int] = None
 
         # Initialize players if roles provided
         roles: List[Role] = []
@@ -122,20 +125,17 @@ class Game:
         if self.state == GameState.FINISHED:
             return True
 
-        alive_werewolves = 0
-        alive_villagers = 0
-        alive_gods = 0
-
-        for p in self._players:
-            if not p.is_alive:
-                continue
-            
-            if p.role == Role.WEREWOLF:
-                alive_werewolves += 1
-            elif p.role == Role.VILLAGER:
-                alive_villagers += 1
-            else:
-                alive_gods += 1
+        alive_werewolves = sum(
+            1 for p in self._players if p.is_alive and p.role == Role.WEREWOLF
+        )
+        alive_villagers = sum(
+            1 for p in self._players if p.is_alive and p.role == Role.VILLAGER
+        )
+        alive_gods = sum(
+            1
+            for p in self._players
+            if p.is_alive and p.role not in (Role.WEREWOLF, Role.VILLAGER)
+        )
 
         # Game ends if all werewolves are dead (villagers win)
         # or if werewolves equal or outnumber villagers (werewolves win)
@@ -202,7 +202,8 @@ class Game:
                 self._running = False
         elif self.state == GameState.MORNING:
             # Morning --> Evening or End
-            # Check if game ends after voting (should be checked before calling state_switch)
+            # Check if game ends after voting
+            # (should be checked before calling state_switch)
             if self.is_end():
                 self.state = GameState.FINISHED
                 self._running = False
@@ -216,7 +217,8 @@ class Game:
         Args:
             voting_result (List[int]): the list of voted players' ID
         Returns:
-            bool: True if a player was successfully voted out, False if there's a tie
+            bool: True if a player was successfully voted out,
+                  False if there's a tie
         """
         if not voting_result:
             return False
@@ -259,7 +261,8 @@ class Game:
         Args:
             voting_result (List[int]): the list of voted players' ID
         Returns:
-            bool: True if a player was successfully voted to be killed, False if there's a tie
+            bool: True if a player was successfully voted to be killed,
+                  False if there's a tie
         """
         if not voting_result:
             return False
