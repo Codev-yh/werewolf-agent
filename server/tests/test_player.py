@@ -1,6 +1,6 @@
 """Tests for Player class and Role enum."""
 
-from game_logic.player import Player, Role, DeathReason
+from game_logic.player import DeathReason, Player, Role
 
 
 class TestRole:
