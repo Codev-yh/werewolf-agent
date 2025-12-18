@@ -1,16 +1,19 @@
 """Contains the Agent Server Class
 
-AgentServer is used to deal with connections from player's code. It's role includes:
+AgentServer is used to deal with connections from player's code. Its role
+includes:
 - Deal with connections from agent. Provide functions like connecting,
 reconnecting, disconnecting, etc.
-- Parse the messages according to the protocol. Then send necessary message to GameRunner.
+- Parse the messages according to the protocol. Then send necessary message
+to GameRunner.
 - Afford a sending message interface to GameRunner.
 - ...
 """
 
-from typing import Tuple
+from typing import TYPE_CHECKING, Tuple
 
-from game_controller.game_runner import GameRunner
+if TYPE_CHECKING:
+    from game_controller.game_runner import GameRunner
 
 
 # pylint: disable=too-few-public-methods
@@ -25,14 +28,15 @@ class AgentServer:
         """Start the agent server.
 
         Start agent server when it's not running. If the server is already
-        started, then raise. This coroutine should be awaited, and it will finish
-        immediately, leaving a serving .
+        started, then raise. This coroutine should be awaited, and it will
+        finish immediately, leaving a serving .
         """
         raise NotImplementedError
 
-    def bind_runner(self, runner: GameRunner):
+    def bind_runner(self, runner: "GameRunner") -> None:
         """Bind the AgentServer into a GameRunner.
 
-        If the bound already exists, then pass. If already bound with different
-        runner, then raise.
+        If the bound already exists, then pass. If already bound with
+        different runner, then raise.
         """
+        raise NotImplementedError
