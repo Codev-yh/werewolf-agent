@@ -1,6 +1,6 @@
 import json
 
-from .interface import GameEvent, Gamestate, Player
+from .interface import GameEvent, GameState, Player
 
 
 class Message:
@@ -57,7 +57,7 @@ class WerewolfActionMessage(Message):
     def __init__(
         self,
         token: str,
-        game_state: Gamestate,
+        game_state: GameState,
         night_numbers: int,
         alive_players: list,
         teammates: list,
@@ -96,7 +96,7 @@ class SeerActionMessage(Message):
     def __init__(
         self,
         token: str,
-        game_state: Gamestate,
+        game_state: GameState,
         night_numbers: int,
         alive_players: list,
         previous_checks: list,
@@ -130,7 +130,7 @@ class WitchActionMessage(Message):
     def __init__(
         self,
         token: str,
-        game_state: Gamestate,
+        game_state: GameState,
         night_numbers: int,
         alive_players: list,
         poison_available: bool,
@@ -170,7 +170,7 @@ class HunterActionMessage(Message):
     def __init__(
         self,
         token: str,
-        game_state: Gamestate,
+        game_state: GameState,
         cause: str,
         killed_by: int,
         alive_players: list,
@@ -204,7 +204,7 @@ class DiscussMessage(Message):
     def __init__(
         self,
         token: str,
-        game_state: Gamestate,
+        game_state: GameState,
         day_number: int,
         speech_order: int,
         previous_speeches: list,
@@ -250,7 +250,7 @@ class VoteMessage(Message):
     def __init__(
         self,
         token: str,
-        game_state: Gamestate,
+        game_state: GameState,
         day_number: int,
         alive_players: list,
         discussion_summary: str,
@@ -286,7 +286,7 @@ class VoteResponseMessage(Message):
 # server send DefendMessage to agent
 class DefendMessage(Message):
     def __init__(
-        self, token: str, game_state: Gamestate, accusations: list, time_limit: int
+        self, token: str, game_state: GameState, accusations: list, time_limit: int
     ):
         super().__init__()
         self.msg = {
@@ -320,7 +320,7 @@ class GameOverMessage(Message):
         token: str,
         winner: str,
         winning_players: list,
-        final_state: Gamestate,
+        final_state: GameState,
         role_reveal: list,
         performance_stats: list,
     ):
